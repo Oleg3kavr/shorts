@@ -65,6 +65,12 @@ export function buildApp(options: BuildAppOptions = {}) {
       return reply.status(404).send({ message: 'Job not found' });
     }
 
+    await jobsQueue.add(
+      'process-job',
+      { jobId: job.id },
+      { jobId: job.id }
+    );
+
     const queuedJob = await prisma.job.updateMany({
       where: {
         id: job.id,
@@ -78,12 +84,6 @@ export function buildApp(options: BuildAppOptions = {}) {
     if (queuedJob.count === 0) {
       return reply.status(409).send({ message: 'Job is already being processed' });
     }
-
-    await jobsQueue.add(
-      'process-job',
-      { jobId: job.id },
-      { jobId: job.id }
-    );
 
     return { ok: true };
   });
