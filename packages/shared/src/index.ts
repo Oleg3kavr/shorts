@@ -14,6 +14,7 @@ export const artifactSchema = z.object({
   id: z.string().uuid(),
   type: z.string().min(1),
   key: z.string().min(1),
+  downloadUrl: z.string().url(),
   title: z.string().nullable(),
   startSec: z.number().int().nullable(),
   endSec: z.number().int().nullable(),
