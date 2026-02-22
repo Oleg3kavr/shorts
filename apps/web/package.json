@@ -5,8 +5,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "node -e \"console.log('lint ok')\"",
-    "typecheck": "node -e \"console.log('typecheck ok')\"",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.js"
   },
   "dependencies": {
