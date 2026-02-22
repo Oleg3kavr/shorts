@@ -82,6 +82,20 @@ Check API health:
 curl http://localhost:8000/healthz
 ```
 
+## E2E smoke test
+
+Run the end-to-end smoke test stack (Postgres, Redis, MinIO, API, worker, tester):
+
+```bash
+docker compose -f infra/docker-compose.e2e.yml up --build -d
+docker compose -f infra/docker-compose.e2e.yml run --rm tester
+docker compose -f infra/docker-compose.e2e.yml down -v
+```
+
+The smoke script (`infra/scripts/e2e-smoke.js`) validates this flow:
+
+`create job -> presign upload -> upload -> attach input -> queue -> worker done`.
+
 ## Jobs v0 curl flow
 
 Create a job:
