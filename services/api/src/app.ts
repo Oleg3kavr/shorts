@@ -65,12 +65,23 @@ export function buildApp(options: BuildAppOptions = {}) {
       return reply.status(404).send({ message: 'Job not found' });
     }
 
-    await jobsQueue.add('process-job', { jobId: job.id });
-
     await prisma.job.update({
       where: { id: job.id },
       data: { status: 'queued', error: null }
     });
+
+    try {
+      await jobsQueue.add('process-job', { jobId: job.id });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown enqueue error';
+
+      await prisma.job.update({
+        where: { id: job.id },
+        data: { status: 'failed', error: message }
+      });
+
+      return reply.status(503).send({ message: 'Failed to enqueue job' });
+    }
 
     return { ok: true };
   });
