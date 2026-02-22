@@ -4,12 +4,15 @@ import Fastify from 'fastify';
 import Redis from 'ioredis';
 import { nanoid } from 'nanoid';
 
-const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6379';
-const connection = new Redis(redisUrl, { maxRetriesPerRequest: null });
-const jobsQueue = new Queue('jobs', { connection });
+type BuildAppOptions = {
+  redisUrl?: string;
+};
 
-export function buildApp() {
+export function buildApp(options: BuildAppOptions = {}) {
   const app = Fastify();
+  const redisUrl = options.redisUrl ?? process.env.REDIS_URL ?? 'redis://localhost:6379';
+  const connection = new Redis(redisUrl, { maxRetriesPerRequest: null });
+  const jobsQueue = new Queue('jobs', { connection });
 
   app.get('/healthz', async () => ({ status: 'ok' }));
 

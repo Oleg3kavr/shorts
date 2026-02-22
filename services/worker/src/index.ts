@@ -2,11 +2,14 @@ import { prisma } from '@shorts/db';
 import { Worker } from 'bullmq';
 import Redis from 'ioredis';
 
-const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6379';
-
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export function startWorker() {
+type StartWorkerOptions = {
+  redisUrl?: string;
+};
+
+export function startWorker(options: StartWorkerOptions = {}) {
+  const redisUrl = options.redisUrl ?? process.env.REDIS_URL ?? 'redis://localhost:6379';
   const connection = new Redis(redisUrl, { maxRetriesPerRequest: null });
 
   const worker = new Worker<{ jobId: string }>(
@@ -41,6 +44,10 @@ export function startWorker() {
 
   worker.on('ready', () => {
     console.log('worker started');
+  });
+
+  worker.on('closed', async () => {
+    await connection.quit();
   });
 
   return worker;
