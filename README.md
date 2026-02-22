@@ -74,6 +74,8 @@ Start the full stack with local S3-compatible storage via MinIO:
 docker compose -f infra/docker-compose.yml -f infra/docker-compose.local.yml up --build
 ```
 
+Note: in the local MinIO override, the API signs URLs with `http://localhost:9000` so upload/download links work from your host browser.
+
 Open the MinIO console at http://localhost:9001 (login: `minioadmin` / `minioadmin`).
 
 Check API health:
