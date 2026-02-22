@@ -156,6 +156,8 @@ export function buildApp(options: BuildAppOptions = {}) {
       data: { status: 'queued', error: null }
     });
 
+    await jobsQueue.add('process-job', { jobId: job.id });
+
     return { ok: true };
   });
 
