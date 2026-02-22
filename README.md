@@ -82,6 +82,14 @@ Check API health:
 curl http://localhost:8000/healthz
 ```
 
+## CI security and dependency gates
+
+GitHub Actions now enforces repository-level security and quality checks on pull requests and `main`:
+
+- `CI` runs lint, typecheck, tests, and a gitleaks secret scan (fails if secrets are detected).
+- `CodeQL` analyzes JavaScript/TypeScript code on PRs, pushes to `main`, and weekly on a schedule.
+- Dependabot opens weekly update PRs for npm dependencies and GitHub Actions.
+
 ## E2E smoke test
 
 Run the end-to-end smoke test stack (Postgres, Redis, MinIO, API, worker, tester):
