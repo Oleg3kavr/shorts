@@ -10,10 +10,12 @@ function sleep(ms) {
 }
 
 async function requestJson(path, options = {}) {
+  const hasBody = options.body != null;
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers: {
-      'content-type': 'application/json',
+      ...(hasBody ? { 'content-type': 'application/json' } : {}),
       ...(options.headers ?? {})
     }
   });
