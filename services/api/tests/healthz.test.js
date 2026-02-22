@@ -26,3 +26,14 @@ test('queue route persists queued status before enqueueing', () => {
   assert.ok(updateIndex !== -1, 'Job status update should exist in queue route');
   assert.ok(updateIndex < addIndex, 'Status should be persisted to queued before enqueueing worker job');
 });
+
+test('queue route handles enqueue failures by marking job failed', () => {
+  const source = fs.readFileSync(new URL('../src/app.ts', import.meta.url), 'utf8');
+  const routeStart = source.indexOf("app.post('/v1/jobs/:token/queue'");
+  const routeEnd = source.indexOf("app.addHook('onClose'", routeStart);
+  const routeSource = source.slice(routeStart, routeEnd);
+
+  assert.match(routeSource, /catch \(error\)/);
+  assert.match(routeSource, /status: 'failed'/);
+  assert.match(routeSource, /return reply\.status\(503\)\.send\(\{ message: 'Failed to enqueue job' \}\);/);
+});
