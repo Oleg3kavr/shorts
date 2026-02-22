@@ -1,0 +1,25 @@
+{
+  "name": "@shorts/shared",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "node -e \"console.log('lint ok')\"",
+    "typecheck": "node -e \"console.log('typecheck ok')\"",
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "zod": "3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "22.7.5",
+    "tsx": "4.19.1",
+    "typescript": "5.6.3"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "shorts-monorepo",
+  "private": true,
+  "packageManager": "pnpm@10.23.0",
+  "scripts": {
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test"
+  }
+}
