@@ -1,6 +1,6 @@
 import { prisma } from '@shorts/db';
 import { Worker } from 'bullmq';
-import Redis from 'ioredis';
+import { Redis } from 'ioredis';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

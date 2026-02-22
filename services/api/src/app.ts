@@ -2,7 +2,7 @@ import { prisma } from '@shorts/db';
 import { createJobResponseSchema, jobStatusResponseSchema } from '@shorts/shared';
 import { Queue } from 'bullmq';
 import Fastify from 'fastify';
-import Redis from 'ioredis';
+import { Redis } from 'ioredis';
 import { nanoid } from 'nanoid';
 
 type BuildAppOptions = {
