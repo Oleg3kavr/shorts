@@ -6,6 +6,6 @@
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "postinstall": "pnpm --filter @shorts/db db:generate"
+    "postinstall": "if test -f packages/db/prisma/schema.prisma; then pnpm --filter @shorts/db db:generate; else echo 'Skipping Prisma client generation (schema not available in this install context).'; fi"
   }
 }
