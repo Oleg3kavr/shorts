@@ -4,7 +4,7 @@ WORKDIR /repo
 
 RUN corepack enable
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-workspace.yaml ./
 COPY apps/web/package.json apps/web/package.json
 COPY services/api/package.json services/api/package.json
 COPY services/worker/package.json services/worker/package.json
