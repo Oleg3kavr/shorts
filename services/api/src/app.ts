@@ -65,16 +65,25 @@ export function buildApp(options: BuildAppOptions = {}) {
       return reply.status(404).send({ message: 'Job not found' });
     }
 
+    const queuedJob = await prisma.job.updateMany({
+      where: {
+        id: job.id,
+        status: {
+          in: ['created', 'queued', 'failed']
+        }
+      },
+      data: { status: 'queued', error: null }
+    });
+
+    if (queuedJob.count === 0) {
+      return reply.status(409).send({ message: 'Job is already being processed' });
+    }
+
     await jobsQueue.add(
       'process-job',
       { jobId: job.id },
       { jobId: job.id }
     );
-
-    await prisma.job.update({
-      where: { id: job.id },
-      data: { status: 'queued', error: null }
-    });
 
     return { ok: true };
   });

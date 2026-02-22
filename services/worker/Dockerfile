@@ -10,6 +10,7 @@ COPY services/api/package.json services/api/package.json
 COPY services/worker/package.json services/worker/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/db/package.json packages/db/package.json
+COPY packages/db/prisma/schema.prisma packages/db/prisma/schema.prisma
 
 RUN pnpm install
 
