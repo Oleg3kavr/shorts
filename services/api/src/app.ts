@@ -71,11 +71,15 @@ export function buildApp(options: BuildAppOptions = {}) {
       });
     }
 
-    await jobsQueue.add(
-      'process-job',
-      { jobId: job.id },
-      { jobId: job.id }
-    );
+    const existingQueueJob = await jobsQueue.getJob(job.id);
+
+    if (existingQueueJob) {
+      return reply.status(409).send({
+        message: 'Job is already queued or has been processed'
+      });
+    }
+
+    await jobsQueue.add('process-job', { jobId: job.id }, { jobId: job.id });
 
     await prisma.job.update({
       where: { id: job.id },
