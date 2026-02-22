@@ -11,7 +11,7 @@ test('jobs routes are scaffolded', () => {
 });
 
 
-test('queue route enqueues before persisting queued status', () => {
+test('queue route persists queued status before enqueueing', () => {
   const source = fs.readFileSync(new URL('../src/app.ts', import.meta.url), 'utf8');
   const routeStart = source.indexOf("app.post('/v1/jobs/:token/queue'");
   const routeEnd = source.indexOf("app.addHook('onClose'", routeStart);
@@ -22,5 +22,5 @@ test('queue route enqueues before persisting queued status', () => {
 
   assert.ok(addIndex !== -1, 'Queue add call should exist in queue route');
   assert.ok(updateIndex !== -1, 'Job status update should exist in queue route');
-  assert.ok(addIndex < updateIndex, 'Queue add should happen before status transition to queued');
+  assert.ok(updateIndex < addIndex, 'Status should be persisted to queued before enqueueing worker job');
 });
