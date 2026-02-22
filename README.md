@@ -35,3 +35,21 @@ Monorepo scaffold for a SaaS that turns uploaded videos into short clips.
    pnpm --filter @shorts/api dev
    pnpm --filter @shorts/worker dev
    ```
+
+## Docker Compose full stack
+
+Start the full stack (Postgres, Redis, API, worker, web):
+
+```bash
+docker compose -f infra/docker-compose.yml up --build
+```
+
+Check API health:
+
+```bash
+curl http://localhost:8000/healthz
+```
+
+Open the web app:
+
+- http://localhost:3000
