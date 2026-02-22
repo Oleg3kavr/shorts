@@ -11,6 +11,7 @@ Monorepo scaffold for a SaaS that turns uploaded videos into short clips.
 - `services/api` - Fastify API service.
 - `services/worker` - Node worker service scaffold.
 - `packages/shared` - Shared schemas/types.
+- `packages/db` - Prisma schema and shared Prisma client.
 - `infra` - Docker Compose and helper scripts.
 
 ## Local development
@@ -19,17 +20,25 @@ Monorepo scaffold for a SaaS that turns uploaded videos into short clips.
    ```bash
    pnpm install
    ```
-2. (Optional) Start local infra:
+2. Generate Prisma client (also runs via root `postinstall`):
+   ```bash
+   pnpm --filter @shorts/db db:generate
+   ```
+3. Push the database schema for local MVP development:
+   ```bash
+   pnpm --filter @shorts/db db:push
+   ```
+4. (Optional) Start local infra:
    ```bash
    ./infra/scripts/dev.sh
    ```
-3. Run checks:
+5. Run checks:
    ```bash
    pnpm -r lint
    pnpm -r typecheck
    pnpm -r test
    ```
-4. Run apps/services:
+6. Run apps/services:
    ```bash
    pnpm --filter @shorts/web dev
    pnpm --filter @shorts/api dev
@@ -49,6 +58,32 @@ Check API health:
 ```bash
 curl http://localhost:8000/healthz
 ```
+
+## Jobs v0 curl flow
+
+Create a job:
+
+```bash
+curl -s -X POST http://localhost:8000/v1/jobs
+```
+
+Queue the job (replace `$TOKEN` from create response):
+
+```bash
+curl -s -X POST http://localhost:8000/v1/jobs/$TOKEN/queue
+```
+
+Poll status until done:
+
+```bash
+while true; do
+  curl -s http://localhost:8000/v1/jobs/$TOKEN
+  echo
+  sleep 1
+done
+```
+
+Expected lifecycle: `created -> queued -> processing -> done`.
 
 Open the web app:
 
