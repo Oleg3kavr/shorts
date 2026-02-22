@@ -14,34 +14,52 @@ function getEnv(name: string): string {
   return value;
 }
 
-const endpoint = getEnv('S3_ENDPOINT');
-const bucket = getEnv('S3_BUCKET');
+type StorageClient = {
+  bucket: string;
+  client: S3Client;
+};
 
-const s3Client = new S3Client({
-  endpoint,
-  region: process.env.S3_REGION ?? DEFAULT_REGION,
-  forcePathStyle: true,
-  credentials: {
-    accessKeyId: getEnv('S3_ACCESS_KEY_ID'),
-    secretAccessKey: getEnv('S3_SECRET_ACCESS_KEY')
+let storageClient: StorageClient | null = null;
+
+function getStorageClient(): StorageClient {
+  if (storageClient) {
+    return storageClient;
   }
-});
 
-export async function createPresignedPutUrl(key: string, contentType: string) {
+  storageClient = {
+    bucket: getEnv('S3_BUCKET'),
+    client: new S3Client({
+      endpoint: getEnv('S3_ENDPOINT'),
+      region: process.env.S3_REGION ?? DEFAULT_REGION,
+      forcePathStyle: true,
+      credentials: {
+        accessKeyId: getEnv('S3_ACCESS_KEY_ID'),
+        secretAccessKey: getEnv('S3_SECRET_ACCESS_KEY')
+      }
+    })
+  };
+
+  return storageClient;
+}
+
+export async function createPresignedPutUrl(key: string, contentType: string, sizeBytes: number) {
+  const { bucket, client } = getStorageClient();
   const command = new PutObjectCommand({
     Bucket: bucket,
     Key: key,
-    ContentType: contentType
+    ContentType: contentType,
+    ContentLength: sizeBytes
   });
 
-  return getSignedUrl(s3Client, command, { expiresIn: PUT_EXPIRATION_SECONDS });
+  return getSignedUrl(client, command, { expiresIn: PUT_EXPIRATION_SECONDS });
 }
 
 export async function createPresignedGetUrl(key: string) {
+  const { bucket, client } = getStorageClient();
   const command = new GetObjectCommand({
     Bucket: bucket,
     Key: key
   });
 
-  return getSignedUrl(s3Client, command, { expiresIn: GET_EXPIRATION_SECONDS });
+  return getSignedUrl(client, command, { expiresIn: GET_EXPIRATION_SECONDS });
 }

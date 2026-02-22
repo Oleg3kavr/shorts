@@ -11,3 +11,14 @@ test('jobs routes are scaffolded', () => {
   assert.match(source, /app\.get\('\/v1\/jobs\/:token'/);
   assert.match(source, /app\.post\('\/v1\/jobs\/:token\/queue'/);
 });
+
+test('presign route passes declared file size to storage signing', () => {
+  const source = fs.readFileSync(new URL('../src/app.ts', import.meta.url), 'utf8');
+  assert.match(source, /createPresignedPutUrl\(key, contentType, sizeBytes\)/);
+});
+
+test('storage client is initialized lazily and signs content length', () => {
+  const source = fs.readFileSync(new URL('../src/storage.ts', import.meta.url), 'utf8');
+  assert.match(source, /function getStorageClient\(\)/);
+  assert.match(source, /ContentLength: sizeBytes/);
+});

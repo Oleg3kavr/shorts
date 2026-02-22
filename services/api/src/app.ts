@@ -65,7 +65,7 @@ export function buildApp(options: BuildAppOptions = {}) {
       });
     }
 
-    const { filename, contentType, jobToken } = parseResult.data;
+    const { filename, contentType, sizeBytes, jobToken } = parseResult.data;
 
     if (!ALLOWED_MIME_TYPES.has(contentType)) {
       return reply.status(400).send({ message: 'Unsupported content type' });
@@ -74,7 +74,7 @@ export function buildApp(options: BuildAppOptions = {}) {
     const sanitizedFilename = sanitizeFilename(filename);
     const scope = jobToken ?? 'temp';
     const key = `inputs/${scope}/${nanoid(12)}/${sanitizedFilename}`;
-    const uploadUrl = await createPresignedPutUrl(key, contentType);
+    const uploadUrl = await createPresignedPutUrl(key, contentType, sizeBytes);
 
     return { key, uploadUrl };
   });

@@ -76,6 +76,14 @@ export default function UploadPage() {
         throw new Error('Failed to attach uploaded input to the job');
       }
 
+      const queueResponse = await fetch(`${apiBaseUrl}/v1/jobs/${createdJob.token}/queue`, {
+        method: 'POST'
+      });
+
+      if (!queueResponse.ok) {
+        throw new Error('Failed to queue job');
+      }
+
       router.push(`/jobs/${createdJob.token}`);
     } catch (uploadError) {
       setError(uploadError instanceof Error ? uploadError.message : 'Upload failed');
