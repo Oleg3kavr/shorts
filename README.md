@@ -68,6 +68,14 @@ Start the full stack (Postgres, Redis, API, worker, web):
 docker compose -f infra/docker-compose.yml up --build
 ```
 
+Start the full stack with local S3-compatible storage via MinIO:
+
+```bash
+docker compose -f infra/docker-compose.yml -f infra/docker-compose.local.yml up --build
+```
+
+Open the MinIO console at http://localhost:9001 (login: `minioadmin` / `minioadmin`).
+
 Check API health:
 
 ```bash
