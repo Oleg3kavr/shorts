@@ -65,7 +65,11 @@ export function buildApp(options: BuildAppOptions = {}) {
       return reply.status(404).send({ message: 'Job not found' });
     }
 
-    await jobsQueue.add('process-job', { jobId: job.id });
+    await jobsQueue.add(
+      'process-job',
+      { jobId: job.id },
+      { jobId: job.id }
+    );
 
     await prisma.job.update({
       where: { id: job.id },
