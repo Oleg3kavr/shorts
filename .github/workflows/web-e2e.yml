@@ -1,0 +1,50 @@
+name: Web E2E
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 3 * * *'
+
+jobs:
+  web-e2e:
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      COMPOSE_PROJECT_NAME: web_e2e
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and start stack
+        run: docker compose -f infra/docker-compose.e2e.yml up --build -d postgres redis minio minio-init api worker web
+
+      - name: Wait for web health
+        run: |
+          for _ in $(seq 1 30); do
+            if docker compose -f infra/docker-compose.e2e.yml exec -T web wget -qO- http://localhost:3000/upload > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Web did not become healthy in time" >&2
+          exit 1
+
+      - name: Run Playwright web flow
+        run: |
+          docker run --rm \
+            --network "${COMPOSE_PROJECT_NAME}_default" \
+            -v "${GITHUB_WORKSPACE}:/work" \
+            -w /work \
+            mcr.microsoft.com/playwright:v1.50.1-jammy \
+            bash -lc "corepack enable && pnpm install --no-frozen-lockfile && pnpm test:e2e:web"
+
+      - name: Print service logs on failure
+        if: failure()
+        run: |
+          docker compose -f infra/docker-compose.e2e.yml logs api
+          docker compose -f infra/docker-compose.e2e.yml logs worker
+
+      - name: Shutdown stack
+        if: always()
+        run: docker compose -f infra/docker-compose.e2e.yml down -v

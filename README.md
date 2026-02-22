@@ -96,6 +96,23 @@ The smoke script (`infra/scripts/e2e-smoke.js`) validates this flow:
 
 `create job -> presign upload -> upload -> attach input -> queue -> worker done`.
 
+## Browser E2E test (Playwright)
+
+Run the browser-level upload flow test in Docker (Postgres, Redis, MinIO, API, worker, web + Playwright runner):
+
+```bash
+docker compose -p web_e2e -f infra/docker-compose.e2e.yml up --build -d postgres redis minio minio-init api worker web
+docker run --rm --network web_e2e_default -v "$PWD:/work" -w /work mcr.microsoft.com/playwright:v1.50.1-jammy bash -lc "corepack enable && pnpm install --no-frozen-lockfile && pnpm test:e2e:web"
+docker compose -p web_e2e -f infra/docker-compose.e2e.yml down -v
+```
+
+The Playwright spec (`e2e/web.spec.ts`) validates:
+
+- Browser upload from `http://web:3000/upload` using a generated `video/mp4` fixture.
+- Redirect to `/jobs/[token]`.
+- Job reaches `done` within 120s.
+- Artifacts link is shown when available, otherwise `inputKey` is persisted and status is still `done`.
+
 ## Jobs v0 curl flow
 
 Create a job:
