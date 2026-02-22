@@ -1,4 +1,5 @@
 import { prisma } from '@shorts/db';
+import { createJobResponseSchema, jobStatusResponseSchema } from '@shorts/shared';
 import { Queue } from 'bullmq';
 import Fastify from 'fastify';
 import Redis from 'ioredis';
@@ -25,7 +26,7 @@ export function buildApp(options: BuildAppOptions = {}) {
       }
     });
 
-    return { token: job.token, status: job.status };
+    return createJobResponseSchema.parse({ token: job.token, status: job.status });
   });
 
   app.get('/v1/jobs/:token', async (request, reply) => {
@@ -39,7 +40,7 @@ export function buildApp(options: BuildAppOptions = {}) {
       return reply.status(404).send({ message: 'Job not found' });
     }
 
-    return {
+    return jobStatusResponseSchema.parse({
       token: job.token,
       status: job.status,
       inputKey: job.inputKey,
@@ -53,7 +54,7 @@ export function buildApp(options: BuildAppOptions = {}) {
         endSec: artifact.endSec,
         createdAt: artifact.createdAt.toISOString()
       }))
-    };
+    });
   });
 
   app.post('/v1/jobs/:token/queue', async (request, reply) => {
