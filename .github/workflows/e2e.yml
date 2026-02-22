@@ -1,0 +1,31 @@
+name: E2E Smoke
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'
+
+jobs:
+  smoke:
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and start stack
+        run: docker compose -f infra/docker-compose.e2e.yml up --build -d
+
+      - name: Run smoke tester
+        run: docker compose -f infra/docker-compose.e2e.yml run --rm tester
+
+      - name: Print service logs on failure
+        if: failure()
+        run: |
+          docker compose -f infra/docker-compose.e2e.yml logs api
+          docker compose -f infra/docker-compose.e2e.yml logs worker
+
+      - name: Shutdown stack
+        if: always()
+        run: docker compose -f infra/docker-compose.e2e.yml down -v
