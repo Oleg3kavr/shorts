@@ -65,6 +65,12 @@ export function buildApp(options: BuildAppOptions = {}) {
       return reply.status(404).send({ message: 'Job not found' });
     }
 
+    if (job.status !== 'created') {
+      return reply.status(409).send({
+        message: `Job cannot be queued from status ${job.status}`
+      });
+    }
+
     await jobsQueue.add(
       'process-job',
       { jobId: job.id },
