@@ -1,0 +1,13 @@
+# Prevent host-installed dependencies from being copied into images.
+**/node_modules
+
+# Build outputs and caches
+**/.next
+**/dist
+**/coverage
+**/.turbo
+
+# VCS/editor artifacts
+.git
+.gitignore
+.DS_Store
