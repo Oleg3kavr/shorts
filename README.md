@@ -45,6 +45,21 @@ Monorepo scaffold for a SaaS that turns uploaded videos into short clips.
    pnpm --filter @shorts/worker dev
    ```
 
+
+## Object storage configuration
+
+The API now signs direct-to-storage upload/download URLs using the AWS SDK v3 S3 client (compatible with Amazon S3 and Cloudflare R2).
+
+Required API environment variables:
+
+- `S3_ENDPOINT`
+- `S3_BUCKET`
+- `S3_ACCESS_KEY_ID`
+- `S3_SECRET_ACCESS_KEY`
+- `S3_REGION` (optional, defaults to `auto`)
+
+Browser uploads should call `POST /v1/uploads/presign`, upload bytes directly to the returned URL, then attach the key with `POST /v1/jobs/:token/attach-input`.
+
 ## Docker Compose full stack
 
 Start the full stack (Postgres, Redis, API, worker, web):

@@ -7,4 +7,5 @@ test('shared schemas exist', () => {
   assert.match(source, /uploadRequestSchema/);
   assert.match(source, /createJobResponseSchema/);
   assert.match(source, /jobStatusResponseSchema/);
+  assert.match(source, /downloadUrl/);
 });
