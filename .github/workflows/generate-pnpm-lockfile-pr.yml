@@ -3,6 +3,10 @@ name: Generate pnpm-lock.yaml PR
 on:
   workflow_dispatch:
 
+concurrency:
+  group: lockfile-pr
+  cancel-in-progress: true
+
 permissions:
   contents: write
   pull-requests: write
@@ -21,6 +25,8 @@ jobs:
         run: |
           corepack enable
           corepack prepare pnpm@9.15.0 --activate
+          npm config set registry https://registry.npmjs.org/
+          pnpm config set registry https://registry.npmjs.org/
           pnpm -v
 
       - name: Install (generate lockfile)
@@ -33,6 +39,7 @@ jobs:
       - name: Create PR with lockfile
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.CREATE_PR_TOKEN }}
           commit-message: "chore: add pnpm-lock.yaml"
           title: "chore: add pnpm-lock.yaml"
           body: "Auto-generated lockfile for deterministic installs/builds."

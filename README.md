@@ -89,6 +89,7 @@ GitHub Actions now enforces repository-level security and quality checks on pull
 - `CI` runs lint, typecheck, tests, and a gitleaks secret scan (fails if secrets are detected).
 - `CodeQL` analyzes JavaScript/TypeScript code on PRs, pushes to `main`, and weekly on a schedule.
 - Dependabot opens weekly update PRs for npm dependencies and GitHub Actions.
+- The lockfile PR workflow requires an Actions secret named `CREATE_PR_TOKEN` (fine-grained PAT with `Contents: Read and write` + `Pull requests: Read and write`) so downstream workflows still run on the generated `chore/pnpm-lockfile` PR.
 
 ## E2E smoke test
 
