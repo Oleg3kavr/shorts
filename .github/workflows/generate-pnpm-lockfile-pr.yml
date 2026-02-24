@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -29,11 +31,11 @@ jobs:
           pnpm config set registry https://registry.npmjs.org/
           pnpm -v
 
-      - name: Install (generate lockfile)
+      - name: Install (generate lockfile only)
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
         run: |
-          pnpm install --no-frozen-lockfile
+          pnpm install --no-frozen-lockfile --lockfile-only --ignore-scripts
           test -f pnpm-lock.yaml
 
       - name: Create PR with lockfile
