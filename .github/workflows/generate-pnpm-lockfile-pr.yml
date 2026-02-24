@@ -38,7 +38,7 @@ jobs:
           pnpm install --no-frozen-lockfile --lockfile-only --ignore-scripts
           test -f pnpm-lock.yaml
 
-      - name: Debug create PR token presence
+      - name: Validate create PR token is set
         env:
           CREATE_PR_TOKEN: ${{ secrets.CREATE_PR_TOKEN }}
         run: |
@@ -51,6 +51,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.CREATE_PR_TOKEN }}
+          branch-token: ${{ github.token }}
           commit-message: "chore: add pnpm-lock.yaml"
           title: "chore: add pnpm-lock.yaml"
           body: "Auto-generated lockfile for deterministic installs/builds."
