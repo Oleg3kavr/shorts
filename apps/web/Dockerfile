@@ -11,7 +11,7 @@ COPY services/worker/package.json services/worker/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/db/package.json packages/db/package.json
 
-RUN pnpm install
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
