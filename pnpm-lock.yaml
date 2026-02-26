@@ -40,8 +40,8 @@ importers:
   packages/db:
     dependencies:
       '@prisma/client':
-        specifier: 5.21.1
-        version: 5.21.1(prisma@5.21.1)
+        specifier: 7.4.1
+        version: 7.4.1(prisma@5.21.1)(typescript@5.6.3)
     devDependencies:
       '@types/node':
         specifier: 22.7.5
@@ -561,13 +561,19 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  '@prisma/client@5.21.1':
-    resolution: {integrity: sha512-3n+GgbAZYjaS/k0M03yQsQfR1APbr411r74foknnsGpmhNKBG49VuUkxIU6jORgvJPChoD4WC4PqoHImN1FP0w==}
-    engines: {node: '>=16.13'}
+  '@prisma/client-runtime-utils@7.4.1':
+    resolution: {integrity: sha512-8fy74OMYC7mt9cJ2MncIDk1awPRgmtXVvwTN2FlW4JVhbck8Dgt0wTkhPG85myfj4ZeP2stjF9Sdg12n5HrpQg==}
+
+  '@prisma/client@7.4.1':
+    resolution: {integrity: sha512-pgIll2W1NVdof37xLeyySW+yfQ4rI+ERGCRwnO3BjVOx42GpYq6jhTyuALK8VKirvJJIvImgfGDA2qwhYVvMuA==}
+    engines: {node: ^20.19 || ^22.12 || >=24.0}
     peerDependencies:
       prisma: '*'
+      typescript: '>=5.4.0'
     peerDependenciesMeta:
       prisma:
+        optional: true
+      typescript:
         optional: true
 
   '@prisma/debug@5.21.1':
@@ -1846,9 +1852,14 @@ snapshots:
     dependencies:
       playwright: 1.50.1
 
-  '@prisma/client@5.21.1(prisma@5.21.1)':
+  '@prisma/client-runtime-utils@7.4.1': {}
+
+  '@prisma/client@7.4.1(prisma@5.21.1)(typescript@5.6.3)':
+    dependencies:
+      '@prisma/client-runtime-utils': 7.4.1
     optionalDependencies:
       prisma: 5.21.1
+      typescript: 5.6.3
 
   '@prisma/debug@5.21.1': {}
 
