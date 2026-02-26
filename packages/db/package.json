@@ -17,7 +17,7 @@
     "db:push": "prisma db push --schema prisma/schema.prisma"
   },
   "dependencies": {
-    "@prisma/client": "5.21.1"
+    "@prisma/client": "7.4.1"
   },
   "devDependencies": {
     "@types/node": "22.7.5",
