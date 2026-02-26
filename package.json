@@ -10,6 +10,6 @@
     "postinstall": "if test -f packages/db/prisma/schema.prisma; then pnpm --filter @shorts/db db:generate; else echo 'Skipping Prisma client generation (schema not available in this install context).'; fi"
   },
   "devDependencies": {
-    "@playwright/test": "1.50.1"
+    "@playwright/test": "1.58.2"
   }
 }
