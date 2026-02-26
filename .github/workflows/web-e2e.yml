@@ -1,14 +1,20 @@
 name: Web E2E
 
 on:
+  pull_request:
+    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: '30 3 * * *'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   web-e2e:
-    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       COMPOSE_PROJECT_NAME: web_e2e
 
@@ -45,6 +51,24 @@ jobs:
           docker ps -a
           docker compose -f infra/docker-compose.e2e.yml ps -a
           docker compose -f infra/docker-compose.e2e.yml logs --tail=200
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: warn
+
+      - name: Upload Playwright traces on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/**/*.zip
+          if-no-files-found: warn
 
       - name: Shutdown stack
         if: always()
