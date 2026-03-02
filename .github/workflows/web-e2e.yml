@@ -1,14 +1,16 @@
 name: Web E2E
 
 on:
+  pull_request:
+    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: '30 3 * * *'
 
 jobs:
   web-e2e:
-    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       COMPOSE_PROJECT_NAME: web_e2e
 
@@ -16,13 +18,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build and start stack
-        run: docker compose -f infra/docker-compose.e2e.yml up --build -d postgres redis minio minio-init api worker web
+      - name: Docker diagnostics
+        run: |
+          docker version
+          docker compose version
+          docker compose -f infra/docker-compose.e2e.yml config
+
+      - name: Build stack
+        run: docker compose -f infra/docker-compose.e2e.yml build --progress plain
+
+      - name: Start stack
+        run: docker compose -f infra/docker-compose.e2e.yml up -d postgres redis minio minio-init api worker web
 
       - name: Wait for web health
         run: |
           for _ in $(seq 1 30); do
-            if docker compose -f infra/docker-compose.e2e.yml exec -T web wget -qO- http://localhost:3000/upload > /dev/null; then
+            if docker compose -f infra/docker-compose.e2e.yml exec -T web node -e "fetch('http://localhost:3000/upload').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"; then
               exit 0
             fi
             sleep 2
@@ -36,15 +47,16 @@ jobs:
             --network "${COMPOSE_PROJECT_NAME}_default" \
             -v "${GITHUB_WORKSPACE}:/work" \
             -w /work \
+            -e PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 \
             mcr.microsoft.com/playwright:v1.50.1-jammy \
-            bash -lc "corepack enable && pnpm install --no-frozen-lockfile && pnpm test:e2e:web"
+            bash -lc "corepack enable && pnpm install --frozen-lockfile && pnpm test:e2e:web"
 
       - name: Print service logs on failure
         if: failure()
         run: |
           docker ps -a
           docker compose -f infra/docker-compose.e2e.yml ps -a
-          docker compose -f infra/docker-compose.e2e.yml logs --tail=200
+          docker compose -f infra/docker-compose.e2e.yml logs --tail=200 --no-color
 
       - name: Shutdown stack
         if: always()
